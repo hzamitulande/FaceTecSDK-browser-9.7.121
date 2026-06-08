@@ -1,0 +1,69 @@
+ <!-- Welcome to the FaceTec Browser Sample App
+
+ This sample demonstrates Initialization, Liveness Check, Enrollment, Verification, Photo ID Match, Customizing the UX, and Getting Audit Trail Images.
+
+ Please use our technical support form to submit questions and issue reports:  https://dev.facetec.com/support -->
+<!DOCTYPE html>
+<head>
+  <title>Browser SDK - Sample App</title>
+  <meta charset="utf-8" />
+  <link rel="icon" href="../../sample-app-resources/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900,900i');
+  </style>
+  <link rel="stylesheet" href="./css/style.css?v1">
+  <!-- Add iOS meta tags and icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Browser SDK - Sample App">
+  <script type="text/javascript" src="../../sample-app-resources/js/very-old-browser-check.js"></script>
+  <script type="text/javascript" src="./build/SampleApp.js"></script>
+</head>
+<body>
+  <div class="wrapping-box-container">
+    <div id="main-interface">
+      <div id="controls">
+        <div id="vocal-icon-container" class="ft-button">
+          <div><img id="vocal-guidance-icon-minimal" aria-label="Minimal Vocal Guidance Enabled" disabled class="vocal-icon" src="../../sample-app-resources/images/vocal_minimal.png" onclick="SampleApp.onVocalGuidanceSettingsButtonPressed()"></div>
+          <div><img id="vocal-guidance-icon-full" aria-label="Full Vocal Guidance Enabled" disabled class="vocal-icon vocal-guidance-icon-full display-none" src="../../sample-app-resources/images/vocal_full.png" onclick="SampleApp.onVocalGuidanceSettingsButtonPressed()"></div>
+          <div><img id="vocal-guidance-icon-off"  aria-label="Vocal Guidance Disabled"disabled class="vocal-icon vocal-guidance-icon-off display-none" src="../../sample-app-resources/images/vocal_off.png" onclick="SampleApp.onVocalGuidanceSettingsButtonPressed()"></div>
+        </div>
+        <button id="liveness-button" disabled onclick="SampleApp.onLivenessCheckPressed()" class="big-button ft-button">3D Liveness Check</button>
+        <button id="enroll-button" disabled onclick="SampleApp.onEnrollUserPressed()" class="big-button ft-button">Enroll User</button>
+        <button id="verify-button" disabled onclick="SampleApp.onVerifyUserPressed()" class="big-button ft-button">Verify User</button>
+        <button id="id-scan-button" disabled onclick="SampleApp.onPhotoIDMatchPressed()" class="big-button ft-button">Match Face To ID</button>
+        <button id="photo-id-scan-button" disabled onclick="SampleApp.onPhotoIDScanPressed()" class="big-button ft-button">Scan & OCR ID</button>
+        <button id="audit-trail-button" disabled onclick="SampleApp.onViewAuditTrailPressed()" class="medium-button ft-button">View Audit Trail</button>
+        <button id="design-showcase-button" disabled onclick="SampleApp.onDesignShowcasePressed()" class="medium-button ft-button">Toggle Colors & Themes</button>
+        <p id="status" aria-live="polite">Initializing...</p>
+      </div>
+      <div id="additional-screen" display="flex">
+        <div id="additional-screen-image-and-text">
+          <img id="additional-screen-logo"  aria-hidden="true" tabindex="-1">
+          <h2 aria-live="polite">Server Upgrade In Progress</h2>
+          <div id="additional-screen-text" aria-live="polite"></div>
+        </div>
+        <button id="additional-screen-button" class="big-button browser-button ft-button" aria-live="polite">OK</button>
+      </div>
+    </div>
+    <div id="custom-logo-container"  aria-hidden="true" tabindex="-1">
+      <img src="../../sample-app-resources/images/FaceTec_Logo.png">
+    </div>
+  </div>
+  <footer>
+    <span id="copy-right-section">
+      <p id="copy-right" class="footer-element-margin">&copy; 2026 FaceTec, Inc. &thinsp;&middot;&thinsp; Multiple US & International Patents Granted&thinsp;&middot;&thinsp; All Rights Reserved</p>
+      <hr class="hr display-none footer-element-margin" aria-hidden="true" tabindex="-1"></hr>
+      <p class="footer-element-margin"><a href="https://dev.facetec.com/policies/terms.html" target="_blank">Terms &amp; Conditions</a>&thinsp;&middot;&thinsp; <a href="https://dev.facetec.com/policies/privacy_site.html" target="_blank">Site Privacy Policy</a>&thinsp;&middot;&thinsp; <a href=https://dev.facetec.com/policies/privacy_sdk.html target="_blank">SDK Privacy Policy</a></p>
+    </span>
+  </footer>
+  <div id="copy-right-length" aria-hidden="true" tabindex="-1">&copy; 2026 FaceTec, Inc. &thinsp;&middot;&thinsp; Multiple US & International Patents Granted&thinsp;&middot;&thinsp; All Rights Reserved</div>
+  <div class = "loading-session-token-container">
+    <p id="loading-session-token-text" aria-live="polite">Network Connection Slow...</p>
+  </div>
+  <div id="theme-transition-overlay"  aria-hidden="true" tabindex="-1">
+    <img id="theme-transition-overlay-img" onerror="this.style.display='none'" onload="this.style.display='block'" src="">
+  </div>
+</body>
+</html>
