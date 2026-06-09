@@ -176,6 +176,16 @@
   <script src="../../core-sdk/FaceTecSDK.js/FaceTecSDK.js"></script>
 
   <script>
+    // Interceptar console.error para capturar mensajes de error del EnrollmentProcessor
+    var _originalConsoleError = console.error;
+    console.error = function() {
+      _originalConsoleError.apply(console, arguments);
+      var msg = Array.prototype.join.call(arguments, ' ');
+      if (typeof EnrollApp !== 'undefined') {
+        EnrollApp._lastErrorMessage = msg;
+      }
+    };
+
     var DeveloperStatusMessages = {
       logMessage: function(msg) { console.log('[FaceTec]', msg); },
       displayMessage: function(msg) { console.log('[FaceTec UI]', msg); },
@@ -305,15 +315,34 @@
             '<small style="opacity:0.7">Número: +' + waNumber + '</small>'
           );
         } else {
-          setButton('🔄 Intentar de nuevo', true);
-          document.getElementById('start-btn').onclick = startEnrollment;
-          setDescription('El registro no fue exitoso.<br>Por favor intenta nuevamente.');
-          setStatus('error',
-            '❌ <b>Registro fallido</b><br>' +
-            'No fue posible registrar tu identidad. Inténtalo de nuevo con buena iluminación.'
-          );
+          // Detectar si el error es por enrollment duplicado
+          const lastRequest = EnrollApp._lastErrorMessage || '';
+          const isDuplicate = lastRequest.toLowerCase().includes('already exists');
+
+          if (isDuplicate) {
+            setButton('🔐 Ir a verificación', true);
+            document.getElementById('start-btn').onclick = function() {
+              window.location.href = window.location.origin
+                + '/sample-apps/verify/index.html?wa=' + encodeURIComponent(waNumber);
+            };
+            setDescription('<b>Ya tienes un registro activo.</b><br>Pulsa el botón para verificar tu identidad ahora.');
+            setStatus('info',
+              'ℹ️ <b>Usuario ya registrado</b><br>' +
+              'El número <b>+' + waNumber + '</b> ya tiene un rostro registrado en el sistema.<br>' +
+              'Puedes verificarte directamente.'
+            );
+          } else {
+            setButton('🔄 Intentar de nuevo', true);
+            document.getElementById('start-btn').onclick = startEnrollment;
+            setDescription('El registro no fue exitoso.<br>Por favor intenta nuevamente.');
+            setStatus('error',
+              '❌ <b>Registro fallido</b><br>' +
+              'No fue posible registrar tu identidad. Inténtalo de nuevo con buena iluminación.'
+            );
+          }
         }
-      }
+      },
+      _lastErrorMessage: ''
     };
 
     function getSessionToken(callback) {
@@ -368,10 +397,10 @@
 
               setStep(2);
               setDescription(
-                'SDK listo. Presiona el botón para registrar tu rostro.<br>' +
+                'Listo. Presiona el botón para registrar tu rostro.<br>' +
                 '<small style="color:#888">Asegúrate de tener buena iluminación y la cámara desbloqueada.</small>'
               );
-              setButton('Iniciar registro facial 📷', true);
+              setButton('Iniciar registro facial', true);
               document.getElementById('start-btn').onclick = startEnrollment;
             } else {
               setStatus('error', '❌ Error al inicializar el SDK. Verifica las credenciales o tu conexión.');

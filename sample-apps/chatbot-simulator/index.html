@@ -11,46 +11,113 @@
       background: #e5ddd5;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
+      align-items: flex-start; /* móvil: desde arriba */
+      min-height: 100vh;
+      min-height: 100dvh; /* dynamic viewport height en móvil */
     }
 
-    /* ── Ventana del chat ── */
+    /* ── Contenedor principal ── */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* ── Info banner ── */
+    .info-banner {
+      width: 100%;
+      background: #fff3cd;
+      border-bottom: 1px solid #ffc107;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .info-banner b { color: #333; }
+
+    /* ── Ventana del chat — mobile first ── */
     .chat-window {
-      width: 420px;
-      max-width: 100vw;
-      height: 680px;
-      max-height: 100vh;
+      width: 100%;
+      flex: 1;
       background: #e5ddd5;
       display: flex;
       flex-direction: column;
-      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    /* ── Tablet (≥600px): ancho fijo centrado ── */
+    @media (min-width: 600px) {
+      body { align-items: center; }
+      .chat-container {
+        width: 480px;
+        height: 100vh;
+        height: 100dvh;
+      }
+      .info-banner {
+        width: 480px;
+        border-radius: 10px 10px 0 0;
+        border: 1px solid #ffc107;
+        border-bottom: none;
+        margin-top: 16px;
+        flex-shrink: 0;
+      }
+      .chat-window {
+        flex: 1;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+        margin-bottom: 16px;
+      }
+    }
+
+    /* ── Desktop (≥1024px): más espacio ── */
+    @media (min-width: 1024px) {
+      .chat-container {
+        width: 440px;
+        height: 100vh;
+        height: 100dvh;
+      }
+      .info-banner {
+        width: 440px;
+        border-radius: 12px 12px 0 0;
+        margin-top: 24px;
+      }
+      .chat-window {
+        flex: 1;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+        margin-bottom: 24px;
+      }
     }
 
     /* ── Header estilo WhatsApp ── */
     .chat-header {
       background: #075e54;
-      padding: 12px 16px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
     .chat-header .avatar {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #25d366;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
+      overflow: hidden;
       flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .chat-header .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .chat-header .info h2 {
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
     }
     .chat-header .info p {
@@ -62,7 +129,8 @@
     .chat-body {
       flex: 1;
       overflow-y: auto;
-      padding: 12px 16px;
+      -webkit-overflow-scrolling: touch;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -71,17 +139,18 @@
 
     /* ── Burbujas ── */
     .bubble {
-      max-width: 80%;
+      max-width: 82%;
       padding: 8px 12px;
       border-radius: 8px;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.45;
       position: relative;
       animation: fadeIn 0.25s ease;
     }
+    @media (min-width: 600px) { .bubble { font-size: 14px; max-width: 78%; } }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-    /* Mensajes del bot — izquierda */
     .bubble.bot {
       background: #fff;
       align-self: flex-start;
@@ -98,7 +167,6 @@
       border-color: transparent #fff transparent transparent;
     }
 
-    /* Mensajes del usuario — derecha */
     .bubble.user {
       background: #dcf8c6;
       align-self: flex-end;
@@ -122,7 +190,7 @@
       margin-top: 4px;
     }
 
-    /* Burbuja con enlace de verificación */
+    /* ── Burbuja con enlace ── */
     .verify-link-bubble {
       background: #fff;
       align-self: flex-start;
@@ -165,7 +233,7 @@
     .verify-link-bubble .msg-text { padding: 8px 12px 2px; font-size: 14px; color: #303030; }
     .verify-link-bubble .time { padding: 0 12px 6px; font-size: 11px; color: #999; text-align: right; }
 
-    /* Indicador de escritura */
+    /* ── Indicador de escritura ── */
     .typing {
       display: flex;
       align-items: center;
@@ -189,24 +257,29 @@
     /* ── Input area ── */
     .chat-footer {
       background: #f0f0f0;
-      padding: 8px 12px;
+      padding: 8px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
+      /* safe area para notch en iOS */
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
     .chat-footer input {
       flex: 1;
-      padding: 10px 16px;
+      padding: 10px 14px;
       border-radius: 24px;
       border: none;
       outline: none;
       font-size: 15px;
       background: #fff;
       color: #303030;
+      min-width: 0; /* flex shrink correcto */
     }
     .chat-footer input::placeholder { color: #aaa; }
     .chat-footer button {
       width: 44px; height: 44px;
+      min-width: 44px;
       border-radius: 50%;
       border: none;
       background: #25d366;
@@ -220,7 +293,7 @@
     .chat-footer button:hover { background: #128c7e; }
     .chat-footer button:disabled { background: #ccc; cursor: default; }
 
-    /* Etiqueta de fecha */
+    /* ── Etiqueta de fecha ── */
     .date-label {
       text-align: center;
       font-size: 12px;
@@ -231,36 +304,23 @@
       align-self: center;
       margin: 4px 0;
     }
-
-    /* ── Nota informativa arriba ── */
-    .info-banner {
-      width: 420px;
-      max-width: 100vw;
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      color: #555;
-      text-align: center;
-    }
-    .info-banner b { color: #333; }
   </style>
 </head>
 <body>
 
-  <div style="display:flex; flex-direction:column; align-items:center;">
+  <div class="chat-container">
     <div class="info-banner">
-      <b>🧪 Simulador de ChatBot</b><br>
+      <b>🧪 Simulador de ChatBot</b>
     </div>
 
     <div class="chat-window">
       <!-- Header -->
       <div class="chat-header">
-        <div class="avatar">🤖</div>
+        <div class="avatar">
+          <img src="../../core-sdk/FaceTec_images/logo-play.png" alt="Total Play">
+        </div>
         <div class="info">
-          <h2>ChatBot Privado</h2>
+          <h2>Total Play <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" style="vertical-align:middle;margin-left:3px;" fill="#4fc3f7"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/><circle cx="12" cy="12" r="11" fill="none" stroke="#4fc3f7" stroke-width="2"/></svg></h2>
           <p>en línea</p>
         </div>
       </div>
@@ -279,7 +339,6 @@
   </div>
 
   <script>
-    // ── Utilidades ──────────────────────────────────────────────
     function now() {
       return new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
     }
@@ -335,13 +394,13 @@
         </tr>
         <tr>
           <td style="background:#f0f0f0;border-left:4px solid #417FB2;padding:8px 12px;">
-            <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:2px;">Registro Facial — ChatBot Privado</div>
+            <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:2px;">Registro Facial — Total Play</div>
             <div style="font-size:12px;color:#666;">Toca el botón azul para registrar tu rostro</div>
           </td>
         </tr>
         <tr>
           <td style="padding:0;border-radius:0 0 8px 8px;overflow:hidden;">
-            <a href="${enrollUrl}" target="_blank"
+            <a href="${enrollUrl}"
                style="display:block;width:100%;padding:13px 12px;background:#417FB2;color:#fff;text-decoration:none;font-size:15px;font-weight:700;text-align:center;letter-spacing:0.3px;box-sizing:border-box;">
               📋 Registrar mi identidad →
             </a>
@@ -376,13 +435,13 @@
         </tr>
         <tr>
           <td style="background:#f0f0f0;border-left:4px solid #25d366;padding:8px 12px;">
-            <div style="font-size:13px;font-weight:600;color:#075e54;margin-bottom:2px;">Verificación Facial — ChatBot Privado</div>
+            <div style="font-size:13px;font-weight:600;color:#075e54;margin-bottom:2px;">Verificación Facial — Total Play</div>
             <div style="font-size:12px;color:#666;">Toca el botón azul para verificar tu identidad</div>
           </td>
         </tr>
         <tr>
           <td style="padding:0;border-radius:0 0 8px 8px;overflow:hidden;">
-            <a href="${verifyUrl}" target="_blank"
+            <a href="${verifyUrl}"
                style="display:block;width:100%;padding:13px 12px;background:#417FB2;color:#fff;text-decoration:none;font-size:15px;font-weight:700;text-align:center;letter-spacing:0.3px;box-sizing:border-box;">
               🔐 Verificar mi identidad →
             </a>
@@ -485,7 +544,7 @@
       step = 1;
 
       // Bot pregunta qué desea hacer
-      await botSay('👋 ¡Hola! Bienvenido al <b>ChatBot Privado</b>.', 900);
+      await botSay('👋 ¡Hola! Bienvenido a <b>Total Play</b>.', 900);
       await botSay('Necesito saber si estás registrado. Elige entre las siguientes opciones:', 1600);
       appendOptions();
     }
@@ -495,19 +554,102 @@
       if (e.key === 'Enter') handleSend();
     });
 
+    function appendEndSessionButton() {
+      const body = document.getElementById('chat-body');
+      const div = document.createElement('div');
+      div.id = 'end-session-bubble';
+      div.style.cssText = 'align-self:flex-start;display:flex;flex-direction:column;gap:0;margin-top:4px;animation:fadeIn 0.25s ease;max-width:85%;';
+      div.innerHTML = `
+        <div style="background:#fff;padding:10px 14px 6px;border-radius:8px 8px 0 0;border-top-left-radius:0;font-size:14px;color:#303030;box-shadow:0 1px 2px rgba(0,0,0,0.10);">
+          ¿Deseas iniciar una nueva sesión?
+        </div>
+        <button onclick="resetChat()"
+          style="padding:11px 20px;background:#075e54;border:none;border-radius:0 0 8px 8px;
+                 color:#fff;font-size:14px;font-weight:700;cursor:pointer;text-align:center;
+                 width:100%;letter-spacing:0.3px;transition:background 0.2s;">
+          ✅ De acuerdo
+        </button>
+      `;
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function resetChat() {
+      // Limpiar sessionStorage
+      sessionStorage.removeItem(CHAT_KEY);
+      sessionStorage.removeItem(CHAT_KEY + '_step');
+
+      // Limpiar el chat visualmente
+      const body = document.getElementById('chat-body');
+      body.innerHTML = '<div class="date-label">Hoy</div>';
+
+      // Resetear estado
+      step = 0;
+
+      // Rehabilitar input
+      const input = document.getElementById('wa-input');
+      input.disabled = false;
+      input.value = '';
+      document.getElementById('send-btn').disabled = false;
+      input.focus();
+    }
+
+    // ── Persistencia del chat con sessionStorage ────────────────
+    const CHAT_KEY = 'chatbot_history_' + waNumber;
+    function saveChat() {
+      const body = document.getElementById('chat-body');
+      sessionStorage.setItem(CHAT_KEY, body.innerHTML);
+      sessionStorage.setItem(CHAT_KEY + '_step', String(step));
+    }
+
+    function restoreChat() {
+      const saved = sessionStorage.getItem(CHAT_KEY);
+      const savedStep = sessionStorage.getItem(CHAT_KEY + '_step');
+      if (saved) {
+        const body = document.getElementById('chat-body');
+        body.innerHTML = saved;
+        // Eliminar botones de opción guardados (no son funcionales al restaurar)
+        const opts = body.querySelector('#options-bubble');
+        if (opts) opts.remove();
+        body.scrollTop = body.scrollHeight;
+        step = savedStep ? parseInt(savedStep) : 2;
+        // Bloquear input si la conversación ya terminó
+        if (step >= 2) {
+          document.getElementById('wa-input').disabled = true;
+          document.getElementById('send-btn').disabled = true;
+        }
+        return true;
+      }
+      return false;
+    }
+
+    // Guardar chat antes de salir a verify/enroll
+    window.addEventListener('pagehide', saveChat);
+    window.addEventListener('beforeunload', saveChat);
+
     // El input empieza activo — el usuario inicia la conversación
     document.getElementById('wa-input').focus();
 
     // ── Si viene de una verificación exitosa, mostrar bienvenida automática ──
     if (verified) {
-      step = 2; // bloquear el input
+      // Restaurar conversación previa y agregar mensajes de bienvenida
+      const hadHistory = restoreChat();
+      sessionStorage.removeItem(CHAT_KEY);
+      sessionStorage.removeItem(CHAT_KEY + '_step');
+
+      step = 2;
       document.getElementById('wa-input').disabled = true;
       document.getElementById('send-btn').disabled = true;
       (async () => {
         await botSay('🔐 Verificación completada exitosamente.', 700);
-        await botSay(`👋 ¡Hola <b>+${waNumber}</b>! Bienvenido al <b>ChatBot Privado</b>. 🎉`, 1400);
+        await botSay(`👋 ¡Hola <b>+${waNumber}</b>! Bienvenido a <b>Total Play</b>. 🎉`, 1400);
         await botSay('Tu identidad ha sido confirmada. Ya puedes acceder a todos los servicios. ✅', 2000);
+        await botSay('La sesión de verificación ha finalizado. Gracias por usar nuestro sistema de identificación. 👋', 1800);
+        appendEndSessionButton();
       })();
+    } else {
+      // Intentar restaurar chat previo si existe (recarga de página)
+      restoreChat();
     }
   </script>
 </body>
