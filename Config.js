@@ -49,7 +49,8 @@ export var Config = (function () {
         var sdkImageDirectory = "../../core-sdk/FaceTec_images/";
         
         // For Color Customization
-        var outerBackgroundColor = "#ffffff";
+        // El overlay usa backdrop-filter vía CSS inyectado para efecto borroso
+        var outerBackgroundColor = "rgba(15, 23, 42, 0.65)";  // semitransparente para ver fondo borroso
         var frameColor = "#ffffff";
         var borderColor = "#417FB2";
         var ovalColor = "#417FB2";
@@ -139,8 +140,11 @@ export var Config = (function () {
         defaultCustomization.idScanCustomization.captureFrameStrokeColor = borderColor;
 
         // Set Initial Loading Customization
-        defaultCustomization.initialLoadingAnimationCustomization.backgroundColor = buttonAndFeedbackBarTextColor;
-        defaultCustomization.initialLoadingAnimationCustomization.foregroundColor = buttonAndFeedbackBarColor;
+        defaultCustomization.initialLoadingAnimationCustomization.animationRelativeScale = 2.0;                // spinner al máximo tamaño
+        defaultCustomization.initialLoadingAnimationCustomization.backgroundColor = "rgba(255,255,255,0.15)";  // track semitransparente
+        defaultCustomization.initialLoadingAnimationCustomization.foregroundColor  = "#ffffff";                // spinner blanco
+        defaultCustomization.initialLoadingAnimationCustomization.messageTextColor = "#ffffff";                // texto blanco
+        defaultCustomization.initialLoadingAnimationCustomization.messageFont      = "700 22px 'Roboto', sans-serif"; // texto grande y bold
 
         
         return defaultCustomization;

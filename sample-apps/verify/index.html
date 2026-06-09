@@ -162,6 +162,14 @@
       margin-right: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Fondo borroso en el overlay del SDK de FaceTec */
+    .ft-modal-backdrop,
+    [class*="facetec"] .overlay,
+    #facetec-overlay-container {
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+    }
   </style>
 
   <!-- FaceTec SDK: verificar compatibilidad del navegador -->
