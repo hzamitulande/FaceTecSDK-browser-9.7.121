@@ -632,6 +632,10 @@
 
     // ── Si viene de una verificación exitosa, mostrar bienvenida automática ──
     if (verified) {
+      // Limpiar ?verified=true de la URL inmediatamente para evitar que
+      // al presionar "atrás" desde verify se vuelvan a mostrar los mensajes
+      const cleanUrl = window.location.origin + window.location.pathname + '?wa=' + encodeURIComponent(waNumber);
+      history.replaceState(null, '', cleanUrl);
       // Restaurar conversación previa y agregar mensajes de bienvenida
       const hadHistory = restoreChat();
       sessionStorage.removeItem(CHAT_KEY);
@@ -647,10 +651,8 @@
         await botSay('La sesión de verificación ha finalizado. Gracias por usar nuestro sistema de identificación. 👋', 1800);
         appendEndSessionButton();
       })();
-    } else {
-      // Intentar restaurar chat previo si existe (recarga de página)
-      restoreChat();
     }
+    // Si no viene de verificación exitosa, el chat empieza vacío siempre
   </script>
 </body>
 </html>
