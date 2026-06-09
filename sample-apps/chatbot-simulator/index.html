@@ -402,6 +402,7 @@
     // ── Número de WhatsApp: viene del parámetro ?wa= o usa el valor por defecto ──
     const urlParams = new URLSearchParams(window.location.search);
     const waNumber  = (urlParams.get('wa') || '5731258657898').replace(/\D/g, '');
+    const verified  = urlParams.get('verified') === 'true';
 
     // ── Flujo del chat ──────────────────────────────────────────
     // 0 = esperando primer mensaje del usuario
@@ -496,6 +497,18 @@
 
     // El input empieza activo — el usuario inicia la conversación
     document.getElementById('wa-input').focus();
+
+    // ── Si viene de una verificación exitosa, mostrar bienvenida automática ──
+    if (verified) {
+      step = 2; // bloquear el input
+      document.getElementById('wa-input').disabled = true;
+      document.getElementById('send-btn').disabled = true;
+      (async () => {
+        await botSay('🔐 Verificación completada exitosamente.', 700);
+        await botSay(`👋 ¡Hola <b>+${waNumber}</b>! Bienvenido al <b>ChatBot Privado</b>. 🎉`, 1400);
+        await botSay('Tu identidad ha sido confirmada. Ya puedes acceder a todos los servicios. ✅', 2000);
+      })();
+    }
   </script>
 </body>
 </html>

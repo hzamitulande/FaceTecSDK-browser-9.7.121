@@ -51,7 +51,7 @@ export var Config = (function () {
         // For Color Customization
         // El overlay usa backdrop-filter vía CSS inyectado para efecto borroso
         var outerBackgroundColor = "rgba(15, 23, 42, 0.65)";  // semitransparente para ver fondo borroso
-        var frameColor = "#ffffff";
+        var frameColor = "#EEF3FA";  // azul muy claro, acorde con el overlay oscuro
         var borderColor = "#417FB2";
         var ovalColor = "#417FB2";
         var dualSpinnerColor = "#417FB2";
@@ -79,33 +79,48 @@ export var Config = (function () {
         
         // Set Frame Customization
         defaultCustomization.frameCustomization.borderCornerRadius = frameCornerRadius;
-        defaultCustomization.frameCustomization.backgroundColor = frameColor;
-        defaultCustomization.frameCustomization.borderColor = borderColor;
+        defaultCustomization.frameCustomization.backgroundColor    = frameColor;
+        defaultCustomization.frameCustomization.borderColor        = borderColor;
+        defaultCustomization.frameCustomization.borderWidth        = "3px";
+        defaultCustomization.frameCustomization.shadow             = "0 24px 64px rgba(0,0,0,0.45), 0 8px 20px rgba(30,58,95,0.3)";
 
         // Set Overlay Customization
-        defaultCustomization.overlayCustomization.brandingImage = yourAppLogoImage;
-        defaultCustomization.overlayCustomization.backgroundColor = outerBackgroundColor;
+        defaultCustomization.overlayCustomization.brandingImage    = yourAppLogoImage;
+        defaultCustomization.overlayCustomization.backgroundColor  = outerBackgroundColor;
 
         // Set Guidance Customization
-        defaultCustomization.guidanceCustomization.backgroundColors = frameColor;
-        defaultCustomization.guidanceCustomization.foregroundColor = textColor;
-        defaultCustomization.guidanceCustomization.buttonBackgroundNormalColor = buttonAndFeedbackBarColor;
-        defaultCustomization.guidanceCustomization.buttonBackgroundDisabledColor = buttonColorDisabled;
+        defaultCustomization.guidanceCustomization.backgroundColors               = frameColor;
+        defaultCustomization.guidanceCustomization.foregroundColor                = textColor;
+        defaultCustomization.guidanceCustomization.headerFont                     = "700 20px 'Roboto', sans-serif";
+        defaultCustomization.guidanceCustomization.subtextFont                    = "400 14px 'Roboto', sans-serif";
+        defaultCustomization.guidanceCustomization.readyScreenHeaderTextColor     = "#1a2e4a";
+        defaultCustomization.guidanceCustomization.readyScreenSubtextTextColor    = "#5a7a9a";
+        defaultCustomization.guidanceCustomization.retryScreenHeaderTextColor     = "#1a2e4a";
+        defaultCustomization.guidanceCustomization.retryScreenSubtextTextColor    = "#5a7a9a";
+        defaultCustomization.guidanceCustomization.buttonFont                     = "600 15px 'Roboto', sans-serif";
+        defaultCustomization.guidanceCustomization.buttonCornerRadius             = "50px";
+        defaultCustomization.guidanceCustomization.buttonBorderWidth              = "0px";
+        defaultCustomization.guidanceCustomization.buttonBackgroundNormalColor    = buttonAndFeedbackBarColor;
+        defaultCustomization.guidanceCustomization.buttonBackgroundDisabledColor  = buttonColorDisabled;
         defaultCustomization.guidanceCustomization.buttonBackgroundHighlightColor = buttonColorHighlight;
-        defaultCustomization.guidanceCustomization.buttonTextNormalColor = buttonAndFeedbackBarTextColor;
-        defaultCustomization.guidanceCustomization.buttonTextDisabledColor = buttonAndFeedbackBarTextColor;
-        defaultCustomization.guidanceCustomization.buttonTextHighlightColor = buttonAndFeedbackBarTextColor;
-        defaultCustomization.guidanceCustomization.retryScreenImageBorderColor = borderColor;
-        defaultCustomization.guidanceCustomization.retryScreenOvalStrokeColor = borderColor;
+        defaultCustomization.guidanceCustomization.buttonTextNormalColor          = buttonAndFeedbackBarTextColor;
+        defaultCustomization.guidanceCustomization.buttonTextDisabledColor        = buttonAndFeedbackBarTextColor;
+        defaultCustomization.guidanceCustomization.buttonTextHighlightColor       = buttonAndFeedbackBarTextColor;
+        defaultCustomization.guidanceCustomization.retryScreenImageBorderColor    = borderColor;
+        defaultCustomization.guidanceCustomization.retryScreenOvalStrokeColor     = borderColor;
 
         // Set Oval Customization
-        defaultCustomization.ovalCustomization.strokeColor = ovalColor;
-        defaultCustomization.ovalCustomization.progressColor1 = dualSpinnerColor;
-        defaultCustomization.ovalCustomization.progressColor2 = dualSpinnerColor;
+        defaultCustomization.ovalCustomization.strokeColor    = ovalColor;
+        defaultCustomization.ovalCustomization.strokeWidth    = 4;
+        defaultCustomization.ovalCustomization.progressColor1 = "#2563eb";
+        defaultCustomization.ovalCustomization.progressColor2 = "#60a5fa";
 
         // Set Feedback Customization
-        defaultCustomization.feedbackCustomization.backgroundColor = buttonAndFeedbackBarColor;
-        defaultCustomization.feedbackCustomization.textColor = buttonAndFeedbackBarTextColor;
+        defaultCustomization.feedbackCustomization.backgroundColor  = buttonAndFeedbackBarColor;
+        defaultCustomization.feedbackCustomization.textColor        = buttonAndFeedbackBarTextColor;
+        defaultCustomization.feedbackCustomization.cornerRadius     = "100px";
+        defaultCustomization.feedbackCustomization.shadow           = "0 6px 20px rgba(30,58,95,0.45)";
+        defaultCustomization.feedbackCustomization.textFont         = "600 15px 'Roboto', sans-serif";
 
         // Set Cancel Customization
         defaultCustomization.cancelButtonCustomization.customImage = cancelButtonImage;
@@ -115,12 +130,13 @@ export var Config = (function () {
         defaultCustomization.securityWatermarkCustomization.setSecurityWatermarkImage(securityWatermarkImage);
 
         // Set Result Screen Customization
-        defaultCustomization.resultScreenCustomization.backgroundColors = frameColor;
-        defaultCustomization.resultScreenCustomization.foregroundColor = textColor;
-        defaultCustomization.resultScreenCustomization.activityIndicatorColor = buttonAndFeedbackBarColor;
+        defaultCustomization.resultScreenCustomization.backgroundColors               = frameColor;
+        defaultCustomization.resultScreenCustomization.foregroundColor                = textColor;
+        defaultCustomization.resultScreenCustomization.activityIndicatorColor         = buttonAndFeedbackBarColor;
         defaultCustomization.resultScreenCustomization.resultAnimationBackgroundColor = buttonAndFeedbackBarColor;
         defaultCustomization.resultScreenCustomization.resultAnimationForegroundColor = buttonAndFeedbackBarTextColor;
-        defaultCustomization.resultScreenCustomization.uploadProgressFillColor = buttonAndFeedbackBarColor;
+        defaultCustomization.resultScreenCustomization.uploadProgressFillColor        = "#2563eb";
+        defaultCustomization.resultScreenCustomization.uploadProgressTrackColor       = "#cfe2ff";
 
         // Set ID Scan Customization
         defaultCustomization.idScanCustomization.selectionScreenBackgroundColors = frameColor;

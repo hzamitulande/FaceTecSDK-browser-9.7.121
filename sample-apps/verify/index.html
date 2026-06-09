@@ -333,12 +333,15 @@
     // Por ahora solo se loguea para demostración.
     function notifyChatbot(verified) {
       console.log('[ChatBot Notify] wa=' + waNumber + ' verified=' + verified);
-      // Ejemplo real:
-      // fetch('/api/chatbot/verification-result', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ waNumber, verified })
-      // });
+      if (verified) {
+        // Redirigir al chatbot con resultado de verificación exitosa
+        setTimeout(function() {
+          window.location.href = window.location.origin
+            + '/sample-apps/chatbot-simulator/index.html'
+            + '?wa=' + encodeURIComponent(waNumber)
+            + '&verified=true';
+        }, 2500); // esperar 2.5s para que el usuario vea la pantalla de éxito
+      }
     }
 
     // ── Obtener session token del servidor FaceTec ──────────────
