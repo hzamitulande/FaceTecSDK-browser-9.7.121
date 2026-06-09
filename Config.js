@@ -68,7 +68,7 @@ export var Config = (function () {
         var cancelButtonLocation = FaceTecSDK.FaceTecCancelButtonLocation.TopLeft;
 
         // For Image Customization
-        var yourAppLogoImage = sdkImageDirectory + "FaceTec_your_app_logo.png";
+        var yourAppLogoImage = sdkImageDirectory + "total-play-logo.png";
         var securityWatermarkImage = FaceTecSDK.FaceTecSecurityWatermarkImage.FaceTec;
         
 

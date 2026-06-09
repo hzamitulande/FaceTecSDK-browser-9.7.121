@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<head>
+  <title>Registro de Identidad — ChatBot Privado</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700');
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
+
+    body {
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    body.visible { opacity: 1; }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      padding: 40px 32px;
+      max-width: 420px;
+      width: 90vw;
+      text-align: center;
+    }
+
+    .logo { 
+        font-size: 48px; 
+        margin-bottom: 12px;
+     }
+
+    .card h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+
+    .wa-number {
+      display: inline-block;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    #start-btn {
+      display: inline-block;
+      padding: 14px 36px;
+      background: #417FB2;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      width: 100%;
+    }
+    #start-btn:hover { background: #396E99; }
+    #start-btn:active { transform: scale(0.98); }
+    #start-btn:disabled { background: #b0bec5; cursor: not-allowed; }
+
+    #status-box {
+      margin-top: 20px;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
+    }
+    #status-box.info    { background: #e3f2fd; color: #1565c0; display: block; }
+    #status-box.success { background: #e8f5e9; color: #2e7d32; display: block; }
+    #status-box.error   { background: #ffebee; color: #c62828; display: block; }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+    .step .dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #999;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .step.active .dot  { background: #417FB2; color: #fff; }
+    .step.done .dot    { background: #2e7d32; color: #fff; }
+    .step label {
+      font-size: 10px;
+      color: #999;
+      text-align: center;
+      transition: color 0.3s;
+    }
+    .step.active label { color: #417FB2; }
+    .step.done label   { color: #2e7d32; }
+    .step-line {
+      flex: 0.3;
+      height: 2px;
+      background: #e0e0e0;
+      align-self: center;
+      margin-bottom: 18px;
+      transition: background 0.3s;
+    }
+    .step-line.done { background: #2e7d32; }
+
+    .error-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      padding: 40px 32px;
+      max-width: 420px;
+      width: 90vw;
+      text-align: center;
+      display: none;
+    }
+    .error-card h1 { color: #c62828; font-size: 20px; margin-bottom: 10px; }
+    .error-card p  { color: #666; font-size: 14px; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <script type="text/javascript" src="../../sample-app-resources/js/very-old-browser-check.js"></script>
+
+  <script type="module">
+    import { Config } from "../../Config.js";
+    window.Config = Config;
+  </script>
+
+  <script src="../../core-sdk/FaceTecSDK.js/FaceTecSDK.js"></script>
+
+  <script>
+    var DeveloperStatusMessages = {
+      logMessage: function(msg) { console.log('[FaceTec]', msg); },
+      displayMessage: function(msg) { console.log('[FaceTec UI]', msg); },
+      logAndDisplayMessage: function(msg) { console.log('[FaceTec]', msg); },
+      logInitializeResult: function() {},
+      logScanOncompleteResult: function() {}
+    };
+  </script>
+
+  <!-- Strings en español (module.exports protegido para el navegador) -->
+  <script type="text/javascript" src="../../core-sdk-optional/FaceTecStrings.es.js"></script>
+  <script>
+    if (typeof module === 'undefined') { window.module = { exports: {} }; }
+  </script>
+
+  <script type="text/javascript" src="../sample-app-js/processors/EnrollmentProcessor.js"></script>
+</head>
+
+<body>
+
+  <div class="card" id="main-card">
+    <div class="logo"><img src="../../core-sdk/FaceTec_images/total-play-logo.png" alt="Logo" style="height:60px;object-fit:contain;"></div>
+    <h1>Registro de Identidad</h1>
+    <div class="wa-number" id="wa-display">Cargando...</div>
+
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="dot">1</div>
+        <label>Inicializar</label>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step" id="step2">
+        <div class="dot">2</div>
+        <label>Escanear<br>rostro</label>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step" id="step3">
+        <div class="dot">3</div>
+        <label>Resultado</label>
+      </div>
+    </div>
+
+    <p class="description" id="description-text">
+      Inicializando el sistema de registro facial...<br>
+      Por favor espera un momento.
+    </p>
+
+    <button id="start-btn" disabled>
+      <span class="spinner"></span> Inicializando...
+    </button>
+
+    <div id="status-box"></div>
+  </div>
+
+  <div class="error-card" id="error-card">
+    <div style="font-size:48px; margin-bottom:12px;">❌</div>
+    <h1>Enlace inválido</h1>
+    <p>Este enlace no contiene un número de WhatsApp válido.<br>
+    Por favor solicita un nuevo enlace al ChatBot.</p>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const waNumber  = urlParams.get('wa') ? urlParams.get('wa').replace(/\D/g, '') : '';
+
+    if (waNumber.length < 10) {
+      document.getElementById('main-card').style.display = 'none';
+      document.getElementById('error-card').style.display = 'block';
+      document.body.classList.add('visible');
+    } else {
+      document.getElementById('wa-display').textContent = '+' + waNumber;
+      document.body.classList.add('visible');
+      initFaceTec();
+    }
+
+    function setStep(active) {
+      [1, 2, 3].forEach(n => {
+        document.getElementById('step' + n).className = 'step' + (n < active ? ' done' : n === active ? ' active' : '');
+      });
+      [1, 2].forEach(n => {
+        document.getElementById('line' + n).className = 'step-line' + (n < active ? ' done' : '');
+      });
+    }
+
+    function setStatus(type, html) {
+      const box = document.getElementById('status-box');
+      box.className = type;
+      box.innerHTML = html;
+    }
+
+    function setDescription(text) {
+      document.getElementById('description-text').innerHTML = text;
+    }
+
+    function setButton(text, enabled, withSpinner = false) {
+      const btn = document.getElementById('start-btn');
+      btn.disabled = !enabled;
+      btn.innerHTML = withSpinner
+        ? `<span class="spinner"></span> ${text}`
+        : `${text}`;
+    }
+
+    // Controlador mínimo para EnrollmentProcessor
+    var EnrollApp = {
+      getLatestEnrollmentIdentifier: function() {
+        return waNumber;  // número de WhatsApp como ID único de enrollment
+      },
+      clearLatestEnrollmentIdentifier: function() {
+        // Se llama cuando el enrollment no fue exitoso (cancelación, timeout, etc.)
+        // No hay nada que limpiar porque el ID viene de la URL, pero debemos rehabilitar el botón
+        setButton('🔄 Intentar de nuevo', true);
+        document.getElementById('start-btn').onclick = startEnrollment;
+        setDescription('El registro fue cancelado.<br>Presiona el botón para intentarlo de nuevo.');
+        setStatus('info', 'ℹ️ Puedes intentar el registro nuevamente cuando estés listo.');
+        setStep(2);
+      },
+      onComplete: function(sessionResult, idScanResult, networkStatus) {
+        const success = sessionResult && sessionResult.isCompletelyDone;
+        setStep(3);
+
+        if (success) {
+          setButton('✅ Registro exitoso', false);
+          setDescription('<b>¡Rostro registrado correctamente!</b><br>Ya puedes usar el ChatBot para verificarte.');
+          setStatus('success',
+            '✅ <b>Registro completado</b><br>' +
+            'Tu identidad facial fue registrada. La próxima vez usa "Verificarme" en el ChatBot.<br>' +
+            '<small style="opacity:0.7">Número: +' + waNumber + '</small>'
+          );
+        } else {
+          setButton('🔄 Intentar de nuevo', true);
+          document.getElementById('start-btn').onclick = startEnrollment;
+          setDescription('El registro no fue exitoso.<br>Por favor intenta nuevamente.');
+          setStatus('error',
+            '❌ <b>Registro fallido</b><br>' +
+            'No fue posible registrar tu identidad. Inténtalo de nuevo con buena iluminación.'
+          );
+        }
+      }
+    };
+
+    function getSessionToken(callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', Config.BaseURL + '/session-token');
+      xhr.setRequestHeader('X-Device-Key', Config.DeviceKeyIdentifier);
+      xhr.setRequestHeader('X-User-Agent', FaceTecSDK.createFaceTecAPIUserAgentString(''));
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          try {
+            var token = JSON.parse(xhr.responseText).sessionToken;
+            if (typeof token === 'string') {
+              callback(token);
+            } else {
+              handleTokenError();
+            }
+          } catch(e) {
+            handleTokenError();
+          }
+        }
+      };
+      xhr.onerror = handleTokenError;
+      xhr.send();
+    }
+
+    function handleTokenError() {
+      setButton('🔄 Reintentar', true);
+      document.getElementById('start-btn').onclick = startEnrollment;
+      setStatus('error', '❌ No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+      setStep(1);
+    }
+
+    function initFaceTec() {
+      FaceTecSDK.setResourceDirectory('../../core-sdk/FaceTecSDK.js/resources');
+      FaceTecSDK.setImagesDirectory('../../core-sdk/FaceTec_images');
+
+      var waitForConfig = setInterval(function() {
+        if (window.Config) {
+          clearInterval(waitForConfig);
+          Config.initializeFromAutogeneratedConfig(FaceTecSDK, function(ok) {
+            if (ok) {
+              // Aplicar strings en español DESPUÉS de inicializar
+              if (typeof FaceTecStrings !== 'undefined') {
+                FaceTecSDK.configureLocalization(FaceTecStrings);
+              }
+
+              // Usar customización completa de Config (colores, logo, estilos)
+              var customization = Config.retrieveConfigurationWizardCustomization(FaceTecSDK);
+              customization.initialLoadingAnimationCustomization.animationRelativeScale = 1.8;
+
+              FaceTecSDK.setCustomization(customization);
+
+              setStep(2);
+              setDescription(
+                'SDK listo. Presiona el botón para registrar tu rostro.<br>' +
+                '<small style="color:#888">Asegúrate de tener buena iluminación y la cámara desbloqueada.</small>'
+              );
+              setButton('Iniciar registro facial 📷', true);
+              document.getElementById('start-btn').onclick = startEnrollment;
+            } else {
+              setStatus('error', '❌ Error al inicializar el SDK. Verifica las credenciales o tu conexión.');
+              setButton('Error de inicialización', false);
+            }
+          });
+        }
+      }, 100);
+    }
+
+    function startEnrollment() {
+      setButton('Obteniendo sesión...', false, true);
+      setStatus('info', 'ℹ️ Conectando con el servidor de registro...');
+      setStep(2);
+
+      getSessionToken(function(sessionToken) {
+        setStatus('info', 'ℹ️ Cámara activa. Sigue las instrucciones en pantalla.');
+        new EnrollmentProcessor(sessionToken, EnrollApp);
+      });
+    }
+  </script>
+</body>
+</html>
