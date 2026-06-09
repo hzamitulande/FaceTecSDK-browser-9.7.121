@@ -155,6 +155,16 @@ export var Config = (function () {
         defaultCustomization.idScanCustomization.captureScreenBackgroundColor = frameColor;
         defaultCustomization.idScanCustomization.captureFrameStrokeColor = borderColor;
 
+        // Guía vocal en español
+        var audioBase = "/sample-app-resources/Vocal_Guidance_Audio_Files/";
+        // defaultCustomization.vocalGuidanceCustomization.mode = FaceTecSDK.FaceTecVocalGuidanceMode.MINIMAL_VOCAL_GUIDANCE;
+        defaultCustomization.vocalGuidanceCustomization.pleaseFrameYourFaceInTheOvalSoundFile = audioBase + "please_frame_your_face_sound_file.mp3";
+        defaultCustomization.vocalGuidanceCustomization.pleaseMoveCloserSoundFile             = audioBase + "please_move_closer_sound_file.mp3";
+        defaultCustomization.vocalGuidanceCustomization.pleaseRetrySoundFile                  = audioBase + "please_retry_sound_file.mp3";
+        defaultCustomization.vocalGuidanceCustomization.uploadingSoundFile                    = audioBase + "uploading_sound_file.mp3";
+        defaultCustomization.vocalGuidanceCustomization.facescanSuccessfulSoundFile           = audioBase + "facescan_successful_sound_file.mp3";
+        defaultCustomization.vocalGuidanceCustomization.pleasePressTheButtonToStartSoundFile  = audioBase + "please_press_button_sound_file.mp3";
+        
         // Set Initial Loading Customization
         defaultCustomization.initialLoadingAnimationCustomization.animationRelativeScale = 2.0;                // spinner al máximo tamaño
         defaultCustomization.initialLoadingAnimationCustomization.backgroundColor = "rgba(255,255,255,0.15)";  // track semitransparente
