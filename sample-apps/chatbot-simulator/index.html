@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, interactive-widget=resizes-content">
   <title>ChatBot Privado — Simulador</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Helvetica, sans-serif; }
@@ -11,19 +11,20 @@
       background: #e5ddd5;
       display: flex;
       justify-content: center;
-      align-items: flex-start; /* móvil: desde arriba */
-      min-height: 100vh;
-      min-height: 100dvh; /* dynamic viewport height en móvil */
+      align-items: flex-start;
+      margin: 0;
+      overflow: hidden;
     }
 
     /* ── Contenedor principal ── */
     .chat-container {
       display: flex;
       flex-direction: column;
-      align-items: center;
       width: 100%;
+      /* altura inicial — se sobreescribe con JS cuando aparece el teclado */
       height: 100vh;
       height: 100dvh;
+      overflow: hidden;
     }
 
     /* ── Info banner ── */
@@ -43,6 +44,7 @@
     .chat-window {
       width: 100%;
       flex: 1;
+      min-height: 0; /* clave: permite que flex item se encoja y chat-body haga scroll */
       background: #e5ddd5;
       display: flex;
       flex-direction: column;
@@ -458,15 +460,16 @@
       body.scrollTop = body.scrollHeight;
     }
 
-    // ── Número de WhatsApp: viene del parámetro ?wa= o usa el valor por defecto ──
+    // ── Número de WhatsApp: viene del parámetro ?wa= o lo escribe el usuario ──
     const urlParams = new URLSearchParams(window.location.search);
-    const waNumber  = (urlParams.get('wa') || '5731258657898').replace(/\D/g, '');
+    let waNumber  = (urlParams.get('wa') || '').replace(/\D/g, '');
     const verified  = urlParams.get('verified') === 'true';
 
     // ── Flujo del chat ──────────────────────────────────────────
     // 0 = esperando primer mensaje del usuario
-    // 1 = esperando elección (registrarme / verificarme)
-    // 2 = conversación terminada
+    // 1 = esperando número de teléfono
+    // 2 = esperando elección (registrarme / verificarme)
+    // 3 = conversación terminada
     let step = 0;
 
     function botSay(text, delay = 0) {
@@ -504,8 +507,8 @@
     }
 
     async function handleOption(choice) {
-      if (step !== 1) return;
-      step = 2;
+      if (step !== 2) return;
+      step = 3;
 
       // Quitar los botones de opción
       const optDiv = document.getElementById('options-bubble');
@@ -529,24 +532,45 @@
     }
 
     async function handleSend() {
-      if (step !== 0) return;
-
       const input = document.getElementById('wa-input');
       const userText = input.value.trim();
-
       if (!userText) return;
 
-      // Mostrar mensaje del usuario y bloquear input
-      appendUserBubble(userText);
-      input.value = '';
-      input.disabled = true;
-      document.getElementById('send-btn').disabled = true;
-      step = 1;
+      if (step === 0) {
+        // Primer mensaje — saludar y pedir número
+        appendUserBubble(userText);
+        input.value = '';
+        input.disabled = true;
+        document.getElementById('send-btn').disabled = true;
+        step = 1;
 
-      // Bot pregunta qué desea hacer
-      await botSay('👋 ¡Hola! Bienvenido a <b>Total Play</b>.', 900);
-      await botSay('Necesito saber si estás registrado. Elige entre las siguientes opciones:', 1600);
-      appendOptions();
+        await botSay('👋 ¡Hola! Bienvenido a <b>Total Play</b>, este es un bot de desarrollo.', 900);
+        await botSay('Para continuar, por favor escribe tu número de teléfono (sin espacios), <b>debes recordar este numero para una futura verificación de identidad</b>:', 1600);
+
+        input.disabled = false;
+        document.getElementById('send-btn').disabled = false;
+        input.focus();
+
+      } else if (step === 1) {
+        // Recibir número de teléfono
+        const phone = userText.replace(/\D/g, '');
+        if (phone.length < 7) {
+          input.style.border = '2px solid #e53935';
+          setTimeout(() => input.style.border = '', 1500);
+          return;
+        }
+
+        waNumber = phone;
+        appendUserBubble(userText);
+        input.value = '';
+        input.disabled = true;
+        document.getElementById('send-btn').disabled = true;
+        step = 2;
+
+        await botSay(`Número registrado: <b>${waNumber}</b> ✅`, 800);
+        await botSay('Necesito saber si estás registrado. Elige entre las siguientes opciones:', 1400);
+        appendOptions();
+      }
     }
 
     // Enviar con Enter
@@ -576,15 +600,16 @@
 
     function resetChat() {
       // Limpiar sessionStorage
-      sessionStorage.removeItem(CHAT_KEY);
-      sessionStorage.removeItem(CHAT_KEY + '_step');
+      sessionStorage.removeItem('chatbot_history_' + waNumber);
+      sessionStorage.removeItem('chatbot_history_' + waNumber + '_step');
+
+      // Resetear número y estado
+      waNumber = (urlParams.get('wa') || '').replace(/\D/g, '');
+      step = 0;
 
       // Limpiar el chat visualmente
       const body = document.getElementById('chat-body');
       body.innerHTML = '<div class="date-label">Hoy</div>';
-
-      // Resetear estado
-      step = 0;
 
       // Rehabilitar input
       const input = document.getElementById('wa-input');
@@ -595,26 +620,26 @@
     }
 
     // ── Persistencia del chat con sessionStorage ────────────────
-    const CHAT_KEY = 'chatbot_history_' + waNumber;
+    const CHAT_KEY = 'chatbot_history_' + (waNumber || 'default');
     function saveChat() {
+      const key = 'chatbot_history_' + (waNumber || 'default');
       const body = document.getElementById('chat-body');
-      sessionStorage.setItem(CHAT_KEY, body.innerHTML);
-      sessionStorage.setItem(CHAT_KEY + '_step', String(step));
+      sessionStorage.setItem(key, body.innerHTML);
+      sessionStorage.setItem(key + '_step', String(step));
     }
 
     function restoreChat() {
-      const saved = sessionStorage.getItem(CHAT_KEY);
-      const savedStep = sessionStorage.getItem(CHAT_KEY + '_step');
+      const key = 'chatbot_history_' + (waNumber || 'default');
+      const saved = sessionStorage.getItem(key);
+      const savedStep = sessionStorage.getItem(key + '_step');
       if (saved) {
         const body = document.getElementById('chat-body');
         body.innerHTML = saved;
-        // Eliminar botones de opción guardados (no son funcionales al restaurar)
         const opts = body.querySelector('#options-bubble');
         if (opts) opts.remove();
         body.scrollTop = body.scrollHeight;
-        step = savedStep ? parseInt(savedStep) : 2;
-        // Bloquear input si la conversación ya terminó
-        if (step >= 2) {
+        step = savedStep ? parseInt(savedStep) : 3;
+        if (step >= 3) {
           document.getElementById('wa-input').disabled = true;
           document.getElementById('send-btn').disabled = true;
         }
@@ -641,18 +666,38 @@
       sessionStorage.removeItem(CHAT_KEY);
       sessionStorage.removeItem(CHAT_KEY + '_step');
 
-      step = 2;
+      step = 3;
       document.getElementById('wa-input').disabled = true;
       document.getElementById('send-btn').disabled = true;
       (async () => {
         await botSay('🔐 Verificación completada exitosamente.', 700);
-        await botSay(`👋 ¡Hola <b>+${waNumber}</b>! Bienvenido a <b>Total Play</b>. 🎉`, 1400);
+        await botSay(`👋 ¡Hola <b>${waNumber}</b>! Bienvenido a <b>Total Play</b>. 🎉`, 1400);
         await botSay('Tu identidad ha sido confirmada. Ya puedes acceder a todos los servicios. ✅', 2000);
         await botSay('La sesión de verificación ha finalizado. Gracias por usar nuestro sistema de identificación. 👋', 1800);
         appendEndSessionButton();
       })();
     }
     // Si no viene de verificación exitosa, el chat empieza vacío siempre
+
+    // ── Ajuste de altura cuando aparece el teclado en móvil ────
+    function adjustHeight() {
+      var vv = window.visualViewport;
+      if (!vv) return;
+      var container = document.querySelector('.chat-container');
+      // Usar la altura visible del viewport (excluye el teclado)
+      container.style.height = vv.height + 'px';
+      // Desplazar si el viewport se mueve (algunos navegadores)
+      container.style.transform = 'translateY(' + (vv.offsetTop || 0) + 'px)';
+      // Hacer scroll al fondo del chat cuando aparece el teclado
+      var body = document.getElementById('chat-body');
+      if (body) setTimeout(function() { body.scrollTop = body.scrollHeight; }, 100);
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', adjustHeight);
+      window.visualViewport.addEventListener('scroll', adjustHeight);
+      adjustHeight();
+    }
   </script>
 </body>
 </html>

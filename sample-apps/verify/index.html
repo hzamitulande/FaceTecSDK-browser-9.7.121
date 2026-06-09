@@ -263,7 +263,7 @@
       document.getElementById('error-card').style.display = 'block';
       document.body.classList.add('visible');
     } else {
-      document.getElementById('wa-display').textContent = '+' + waNumber;
+      document.getElementById('wa-display').textContent = waNumber;
       document.body.classList.add('visible');
       initFaceTec();
     }
@@ -311,7 +311,7 @@
           setStatus('success',
             '✅ <b>Verificación completada</b><br>' +
             'Tu identidad fue confirmada. El ChatBot ya puede continuar la sesión.<br>' +
-            '<small style="opacity:0.7">Número: +' + waNumber + '</small>'
+            '<small style="opacity:0.7">Número: ' + waNumber + '</small>'
           );
           // Notificar al chatbot (aquí puedes hacer un POST a tu backend)
           notifyChatbot(true);

@@ -251,12 +251,12 @@
     const urlParams = new URLSearchParams(window.location.search);
     const waNumber  = urlParams.get('wa') ? urlParams.get('wa').replace(/\D/g, '') : '';
 
-    if (waNumber.length < 10) {
+    if (waNumber.length < 7) {
       document.getElementById('main-card').style.display = 'none';
       document.getElementById('error-card').style.display = 'block';
       document.body.classList.add('visible');
     } else {
-      document.getElementById('wa-display').textContent = '+' + waNumber;
+      document.getElementById('wa-display').textContent = waNumber;
       document.body.classList.add('visible');
       initFaceTec();
     }
@@ -308,12 +308,16 @@
 
         if (success) {
           setButton('✅ Registro exitoso', false);
-          setDescription('<b>¡Rostro registrado correctamente!</b><br>Ya puedes usar el ChatBot para verificarte.');
+          setDescription('<b>¡Rostro registrado correctamente!</b><br>Regresando al ChatBot...');
           setStatus('success',
             '✅ <b>Registro completado</b><br>' +
-            'Tu identidad facial fue registrada. La próxima vez usa "Verificarme" en el ChatBot.<br>' +
-            '<small style="opacity:0.7">Número: +' + waNumber + '</small>'
+            'Tu identidad facial fue registrada. Serás redirigido al ChatBot en unos segundos.'
           );
+          // Regresar al chatbot vacío después de 2.5 segundos
+          setTimeout(function() {
+            window.location.href = window.location.origin
+              + '/sample-apps/chatbot-simulator/index.html?wa=' + encodeURIComponent(waNumber);
+          }, 2500);
         } else {
           // Detectar si el error es por enrollment duplicado
           const lastRequest = EnrollApp._lastErrorMessage || '';
@@ -328,7 +332,7 @@
             setDescription('<b>Ya tienes un registro activo.</b><br>Pulsa el botón para verificar tu identidad ahora.');
             setStatus('info',
               'ℹ️ <b>Usuario ya registrado</b><br>' +
-              'El número <b>+' + waNumber + '</b> ya tiene un rostro registrado en el sistema.<br>' +
+              'El número <b>' + waNumber + '</b> ya tiene un rostro registrado en el sistema.<br>' +
               'Puedes verificarte directamente.'
             );
           } else {
