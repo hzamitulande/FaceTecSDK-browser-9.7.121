@@ -307,13 +307,13 @@
 
         if (success) {
           setButton('✅ Verificación exitosa', false);
-          setDescription('<b>¡Identidad verificada correctamente!</b><br>Regresando a WhatsApp...');
+          setDescription('<b>¡Identidad verificada correctamente!</b><br>Puedes regresar a WhatsApp.');
           setStatus('success',
             '✅ <b>Verificación completada</b><br>' +
-            'Tu identidad fue confirmada. Serás redirigido a WhatsApp en unos segundos.<br>' +
+            'Tu identidad fue confirmada.<br>' +
             '<small style="opacity:0.7">Número: ' + waNumber + '</small>'
           );
-          redirectToWhatsApp();
+          showWhatsAppButton();
         } else {
           setButton('🔄 Intentar de nuevo', true);
           document.getElementById('start-btn').onclick = startVerification;
@@ -329,17 +329,26 @@
 
     // ── Redirigir de vuelta a WhatsApp ─────────────────────────────────
     // El bot puede pasar su número en ?bot=NUMERO para abrir el chat directamente
-    function redirectToWhatsApp() {
+    function showWhatsAppButton() {
       var botNumber = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
-      setTimeout(function() {
-        if (botNumber) {
-          // Abre el chat con el bot de WhatsApp directamente
-          window.location.href = 'https://wa.me/' + botNumber;
-        } else {
-          // Fallback: abre WhatsApp app en general
-          window.location.href = 'whatsapp://';
-        }
-      }, 2500);
+      if (!botNumber) return;
+      var isAndroid = /android/i.test(navigator.userAgent);
+      var waUrl = isAndroid
+        ? 'intent://send/' + botNumber + '#Intent;scheme=whatsapp;package=com.whatsapp;end'
+        : 'whatsapp://send?phone=' + botNumber;
+
+      var btn = document.createElement('a');
+      btn.href = waUrl;
+      btn.innerHTML = '💬 Regresar a WhatsApp';
+      btn.style.cssText = 'display:block;margin-top:16px;padding:14px 20px;background:#25d366;color:#fff;' +
+        'border-radius:30px;text-decoration:none;font-size:16px;font-weight:700;text-align:center;';
+      btn.addEventListener('click', function() {
+        // Intentar cerrar la pestaña después de abrir WhatsApp
+        setTimeout(function() { window.close(); }, 500);
+      });
+
+      var box = document.getElementById('status-box');
+      box.appendChild(btn);
     }
 
     function notifyChatbot(verified) {

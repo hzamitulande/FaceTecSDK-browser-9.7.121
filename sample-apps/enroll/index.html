@@ -308,20 +308,28 @@
 
         if (success) {
           setButton('✅ Registro exitoso', false);
-          setDescription('<b>¡Rostro registrado correctamente!</b><br>Regresando a WhatsApp...');
+          setDescription('<b>¡Rostro registrado correctamente!</b><br>Puedes regresar a WhatsApp.');
           setStatus('success',
             '✅ <b>Registro completado</b><br>' +
-            'Tu identidad facial fue registrada. Serás redirigido a WhatsApp en unos segundos.'
+            'Tu identidad facial fue registrada correctamente.'
           );
-          // Redirigir a WhatsApp tras el registro exitoso
-          var botNumber = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
-          setTimeout(function() {
-            if (botNumber) {
-              window.location.href = 'https://wa.me/' + botNumber;
-            } else {
-              window.location.href = 'whatsapp://';
-            }
-          }, 2500);
+          // Mostrar botón de WhatsApp
+          var botNum = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
+          if (botNum) {
+            var isAndroid = /android/i.test(navigator.userAgent);
+            var waUrl = isAndroid
+              ? 'intent://send/' + botNum + '#Intent;scheme=whatsapp;package=com.whatsapp;end'
+              : 'whatsapp://send?phone=' + botNum;
+            var waBtn = document.createElement('a');
+            waBtn.href = waUrl;
+            waBtn.innerHTML = '💬 Regresar a WhatsApp';
+            waBtn.style.cssText = 'display:block;margin-top:16px;padding:14px 20px;background:#25d366;color:#fff;' +
+              'border-radius:30px;text-decoration:none;font-size:16px;font-weight:700;text-align:center;';
+            waBtn.addEventListener('click', function() {
+              setTimeout(function() { window.close(); }, 500);
+            });
+            document.getElementById('status-box').appendChild(waBtn);
+          }
         } else {
           // Detectar si el error es por enrollment duplicado
           const lastRequest = EnrollApp._lastErrorMessage || '';
