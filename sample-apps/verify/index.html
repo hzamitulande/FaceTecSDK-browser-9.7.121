@@ -307,14 +307,13 @@
 
         if (success) {
           setButton('✅ Verificación exitosa', false);
-          setDescription('<b>¡Identidad verificada correctamente!</b><br>Puedes regresar al ChatBot.');
+          setDescription('<b>¡Identidad verificada correctamente!</b><br>Regresando a WhatsApp...');
           setStatus('success',
             '✅ <b>Verificación completada</b><br>' +
-            'Tu identidad fue confirmada. El ChatBot ya puede continuar la sesión.<br>' +
+            'Tu identidad fue confirmada. Serás redirigido a WhatsApp en unos segundos.<br>' +
             '<small style="opacity:0.7">Número: ' + waNumber + '</small>'
           );
-          // Notificar al chatbot (aquí puedes hacer un POST a tu backend)
-          notifyChatbot(true);
+          redirectToWhatsApp();
         } else {
           setButton('🔄 Intentar de nuevo', true);
           document.getElementById('start-btn').onclick = startVerification;
@@ -328,20 +327,23 @@
       }
     };
 
-    // ── Notificar resultado al backend/chatbot ──────────────────
-    // En producción: aquí haces un POST a tu backend con el resultado.
-    // Por ahora solo se loguea para demostración.
+    // ── Redirigir de vuelta a WhatsApp ─────────────────────────────────
+    // El bot puede pasar su número en ?bot=NUMERO para abrir el chat directamente
+    function redirectToWhatsApp() {
+      var botNumber = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
+      setTimeout(function() {
+        if (botNumber) {
+          // Abre el chat con el bot de WhatsApp directamente
+          window.location.href = 'https://wa.me/' + botNumber;
+        } else {
+          // Fallback: abre WhatsApp app en general
+          window.location.href = 'whatsapp://';
+        }
+      }, 2500);
+    }
+
     function notifyChatbot(verified) {
-      console.log('[ChatBot Notify] wa=' + waNumber + ' verified=' + verified);
-      if (verified) {
-        // Redirigir al chatbot con resultado de verificación exitosa
-        setTimeout(function() {
-          window.location.href = window.location.origin
-            + '/sample-apps/chatbot-simulator/index.html'
-            + '?wa=' + encodeURIComponent(waNumber)
-            + '&verified=true';
-        }, 2500); // esperar 2.5s para que el usuario vea la pantalla de éxito
-      }
+      console.log('[Result] wa=' + waNumber + ' verified=' + verified);
     }
 
     // ── Obtener session token del servidor FaceTec ──────────────

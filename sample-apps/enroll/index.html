@@ -308,15 +308,19 @@
 
         if (success) {
           setButton('✅ Registro exitoso', false);
-          setDescription('<b>¡Rostro registrado correctamente!</b><br>Regresando al ChatBot...');
+          setDescription('<b>¡Rostro registrado correctamente!</b><br>Regresando a WhatsApp...');
           setStatus('success',
             '✅ <b>Registro completado</b><br>' +
-            'Tu identidad facial fue registrada. Serás redirigido al ChatBot en unos segundos.'
+            'Tu identidad facial fue registrada. Serás redirigido a WhatsApp en unos segundos.'
           );
-          // Regresar al chatbot vacío después de 2.5 segundos
+          // Redirigir a WhatsApp tras el registro exitoso
+          var botNumber = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
           setTimeout(function() {
-            window.location.href = window.location.origin
-              + '/sample-apps/chatbot-simulator/index.html?wa=' + encodeURIComponent(waNumber);
+            if (botNumber) {
+              window.location.href = 'https://wa.me/' + botNumber;
+            } else {
+              window.location.href = 'whatsapp://';
+            }
           }, 2500);
         } else {
           // Detectar si el error es por enrollment duplicado
