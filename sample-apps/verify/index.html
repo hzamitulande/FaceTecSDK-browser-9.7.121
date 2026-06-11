@@ -256,6 +256,8 @@
     // ── Leer parámetro ?wa= de la URL ──────────────────────────
     const urlParams   = new URLSearchParams(window.location.search);
     const waNumber    = urlParams.get('wa') ? urlParams.get('wa').replace(/\D/g, '') : '';
+    const botId       = urlParams.get('botId')  || '';
+    const chatId      = urlParams.get('chatId') || '';
 
     // Mostrar tarjeta de error si no viene número válido
     if (waNumber.length < 10) {
@@ -307,22 +309,26 @@
 
         if (success) {
           setButton('✅ Verificación exitosa', false);
-          setDescription('<b>¡Identidad verificada correctamente!</b><br>Puedes regresar a WhatsApp.');
+          setDescription('<b>¡Identidad verificada correctamente!</b><br>Regresando a WhatsApp en 3 segundos...');
           setStatus('success',
             '✅ <b>Verificación completada</b><br>' +
             'Tu identidad fue confirmada.<br>' +
             '<small style="opacity:0.7">Número: ' + waNumber + '</small>'
           );
+          notifyChatbot(true);
           showWhatsAppButton();
+          scheduleWhatsAppRedirect();
         } else {
           setButton('🔄 Intentar de nuevo', true);
           document.getElementById('start-btn').onclick = startVerification;
-          setDescription('La verificación no fue exitosa.<br>Por favor intenta nuevamente.');
+          setDescription('La verificación no fue exitosa.<br>Regresando a WhatsApp en 3 segundos...');
           setStatus('error',
             '❌ <b>Verificación fallida</b><br>' +
             'No fue posible confirmar tu identidad. Inténtalo de nuevo con buena iluminación.'
           );
           notifyChatbot(false);
+          showWhatsAppButton();
+          scheduleWhatsAppRedirect();
         }
       }
     };
@@ -330,7 +336,7 @@
     // ── Redirigir de vuelta a WhatsApp ─────────────────────────────────
     // El bot puede pasar su número en ?bot=NUMERO para abrir el chat directamente
     function showWhatsAppButton() {
-      var botNumber = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
+      var botNumber = urlParams.get('cb') ? urlParams.get('cb').replace(/\D/g, '') : '';
       if (!botNumber) return;
       var isAndroid = /android/i.test(navigator.userAgent);
       var waUrl = isAndroid
@@ -353,6 +359,33 @@
 
     function notifyChatbot(verified) {
       console.log('[Result] wa=' + waNumber + ' verified=' + verified);
+      // GET al backend del bot con el resultado
+      if (botId && chatId) {
+        var status = verified ? '1' : '0';
+        var callbackUrl = 'https://cariai.com/flux/cbmsg'
+          + '?botId=' + encodeURIComponent(botId)
+          + '&chatId=' + encodeURIComponent(chatId)
+          + '&status_verify=' + status;
+        var img = new Image(); // técnica fire-and-forget sin CORS issues
+        img.src = callbackUrl;
+        console.log('[Callback] ' + callbackUrl);
+      }
+    }
+
+    function scheduleWhatsAppRedirect() {
+      var cbNumber = urlParams.get('cb') ? urlParams.get('cb').replace(/\D/g, '') : '';
+      setTimeout(function() {
+        if (cbNumber) {
+          var isAndroid = /android/i.test(navigator.userAgent);
+          if (isAndroid) {
+            window.location.href = 'intent://send/' + cbNumber
+              + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
+          } else {
+            window.location.href = 'whatsapp://send?phone=' + cbNumber;
+          }
+          setTimeout(function() { window.close(); }, 1000);
+        }
+      }, 3000);
     }
 
     // ── Obtener session token del servidor FaceTec ──────────────

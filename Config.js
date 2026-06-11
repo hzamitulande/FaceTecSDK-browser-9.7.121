@@ -172,9 +172,7 @@ export var Config = (function () {
         defaultCustomization.initialLoadingAnimationCustomization.messageTextColor = "#ffffff";                // texto blanco
         defaultCustomization.initialLoadingAnimationCustomization.messageFont      = "700 22px 'Roboto', sans-serif"; // texto grande y bold
 
-        // Ocultar el tag "This App is in Development Mode"
-        defaultCustomization.FaceTecCustomization.enableDevelopmentModeTag = false;
-
+        
         return defaultCustomization;
     };
 

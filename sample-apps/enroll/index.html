@@ -314,7 +314,7 @@
             'Tu identidad facial fue registrada correctamente.'
           );
           // Mostrar botón de WhatsApp
-          var botNum = urlParams.get('bot') ? urlParams.get('bot').replace(/\D/g, '') : '';
+          var botNum = urlParams.get('cb') ? urlParams.get('cb').replace(/\D/g, '') : '';
           if (botNum) {
             var isAndroid = /android/i.test(navigator.userAgent);
             var waUrl = isAndroid
